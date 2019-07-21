@@ -85,6 +85,7 @@
             this.StartMenuTgl.AutoSize = true;
             this.StartMenuTgl.Checked = true;
             this.StartMenuTgl.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.StartMenuTgl.FlatAppearance.BorderSize = 0;
             this.StartMenuTgl.Location = new System.Drawing.Point(266, 30);
             this.StartMenuTgl.Name = "StartMenuTgl";
             this.StartMenuTgl.Size = new System.Drawing.Size(109, 17);
@@ -94,15 +95,20 @@
             // 
             // SelectCustomPathBtn
             // 
+            this.SelectCustomPathBtn.BackColor = System.Drawing.SystemColors.Menu;
+            this.SelectCustomPathBtn.FlatAppearance.BorderSize = 0;
+            this.SelectCustomPathBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.SelectCustomPathBtn.Location = new System.Drawing.Point(538, 3);
             this.SelectCustomPathBtn.Name = "SelectCustomPathBtn";
             this.SelectCustomPathBtn.Size = new System.Drawing.Size(83, 23);
             this.SelectCustomPathBtn.TabIndex = 6;
             this.SelectCustomPathBtn.Text = "Select Folder";
-            this.SelectCustomPathBtn.UseVisualStyleBackColor = true;
+            this.SelectCustomPathBtn.UseVisualStyleBackColor = false;
             // 
             // CustomPathTxt
             // 
+            this.CustomPathTxt.BackColor = System.Drawing.SystemColors.Menu;
+            this.CustomPathTxt.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.CustomPathTxt.Location = new System.Drawing.Point(267, 4);
             this.CustomPathTxt.Name = "CustomPathTxt";
             this.CustomPathTxt.ReadOnly = true;
@@ -111,7 +117,9 @@
             // 
             // MainContinueButton
             // 
-            this.MainContinueButton.BackColor = System.Drawing.Color.Transparent;
+            this.MainContinueButton.BackColor = System.Drawing.SystemColors.Menu;
+            this.MainContinueButton.FlatAppearance.BorderSize = 0;
+            this.MainContinueButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.MainContinueButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.MainContinueButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
             this.MainContinueButton.Location = new System.Drawing.Point(270, 147);
