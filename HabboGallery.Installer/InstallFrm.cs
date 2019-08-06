@@ -7,33 +7,53 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace HabboGalleryInstaller
 {
-    public partial class InstallFrm : Form
+    public partial class InstallFrm : Form, IMessageFilter
     {
         public InstallState State { get; set; }
         public string InstallPath { get; set; }
 
-        public const string APP_NAME = "HabboGallery";
-        public const string ICON_FILENAME = "icon.ico";
-        public const string APP_FILENAME = "HabboGallery.Desktop.exe";
-        public const string HANDLER_FILENAME = "HabboGallerySchemeHandler.exe";
-        public const string SHORTCUT_DESCRIPTION = "A shortcut to HabboGallery Desktop";
-        public const string CERT_ISSUER = "HabboGallery";
-        public const string ROOT_CERT_NAME = "HabboGallery Root Certificate";
-        public const string DOWNLOAD_PATH = "http://exp.test/downloads/HabboGallery.Desktop.zip";
-
         private Dictionary<string, string> _paths;
+
+        #region Draggable Controls
+        private const int WmNclbuttondown = 0xA1;
+        private const int HtCaption = 0x2;
+        private const int WmLbuttondown = 0x0201;
+        [DllImport("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+        [DllImport("user32.dll")]
+        public static extern bool ReleaseCapture();
+
+        public bool DragControl(ref Message m)
+        {
+            if (m.Msg == WmLbuttondown && Control.FromHandle(m.HWnd) == LogoBx)
+            {
+                ReleaseCapture();
+                SendMessage(Handle, WmNclbuttondown, HtCaption, 0);
+                return true;
+            }
+            return false;
+        }
+
+        public bool PreFilterMessage(ref Message m)
+        {
+            return DragControl(ref m);
+        }
+        #endregion
 
         public InstallFrm()
         {
             InitializeComponent();
             TryInstallCertificate();
             State = InstallState.Initial;
-            InstallPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + "\\" + APP_NAME;
+            InstallPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + "\\" + Constants.APP_NAME;
             CustomPathTxt.Text = InstallPath;
+
+            Application.AddMessageFilter(this);
         }
 
         private void CustomizeTgl_CheckedChanged(object sender, EventArgs e)
@@ -59,18 +79,18 @@ namespace HabboGalleryInstaller
                     MainContinueButton.Visible = false;
                     MainInfoLbl.Text = GuideMessages.TEXT_DOWNLOADING;
 
-                    string pathToTemp = await AppDownloader.DownloadZipAsync(DOWNLOAD_PATH);
+                    string pathToTemp = await AppDownloader.DownloadZipAsync(Constants.DOWNLOAD_PATH);
                     MainInfoLbl.Text = GuideMessages.TEXT_EXTRACTING;
                     ZipFile.ExtractToDirectory(pathToTemp, InstallPath);
                     File.Delete(pathToTemp);
 
                     try
                     {
-                        _paths = FindFilePathsInFolders(new string[] { ICON_FILENAME, APP_FILENAME, HANDLER_FILENAME });
+                        _paths = FindFilePathsInFolders(new string[] { Constants.ICON_FILENAME, Constants.APP_FILENAME, Constants.HANDLER_FILENAME });
                         if (!CustomizeTgl.Checked || DesktopShortTgl.Checked)
-                            ShortcutBuilder.CreateShortcut(_paths[APP_FILENAME], _paths[ICON_FILENAME], APP_NAME, SHORTCUT_DESCRIPTION, Environment.SpecialFolder.Desktop);
+                            ShortcutBuilder.CreateShortcut(_paths[Constants.APP_FILENAME], _paths[Constants.ICON_FILENAME], Constants.APP_NAME, Constants.SHORTCUT_DESCRIPTION, Environment.SpecialFolder.Desktop);
                         if (!CustomizeTgl.Checked || StartMenuTgl.Checked)
-                            ShortcutBuilder.CreateShortcut(_paths[APP_FILENAME], _paths[ICON_FILENAME], APP_NAME, SHORTCUT_DESCRIPTION, Environment.SpecialFolder.StartMenu);
+                            ShortcutBuilder.CreateShortcut(_paths[Constants.APP_FILENAME], _paths[Constants.ICON_FILENAME], Constants.APP_NAME, Constants.SHORTCUT_DESCRIPTION, Environment.SpecialFolder.StartMenu);
                         MainInfoLbl.Text = GuideMessages.TEXT_INSTALL_CERT_INIT;
                         MainContinueButton.Text = GuideMessages.BUTTON_INSTALL_CERT_INIT;
                         MainContinueButton.Visible = true;
@@ -99,7 +119,7 @@ namespace HabboGalleryInstaller
                         MainContinueButton.Visible = true;
                         State = InstallState.Done;
 
-                        RegisterURLProtocol(_paths[HANDLER_FILENAME]);
+                        RegisterURLProtocol(_paths[Constants.HANDLER_FILENAME]);
                     }
                     else
                     {
@@ -110,7 +130,7 @@ namespace HabboGalleryInstaller
                 case InstallState.Done:
                 {
                     if (LaunchAppTgl.Checked)
-                        Process.Start(_paths[APP_FILENAME]);
+                        Process.Start(_paths[Constants.APP_FILENAME]);
 
                     Application.Exit();
                     break;
@@ -120,22 +140,22 @@ namespace HabboGalleryInstaller
 
         private bool TryInstallCertificate()
         {
-            CertificateManager manager = new CertificateManager(CERT_ISSUER, ROOT_CERT_NAME);
+            CertificateManager manager = new CertificateManager(Constants.CERT_ISSUER, Constants.ROOT_CERT_NAME);
             return manager.CreateTrustedRootCertificate();
         }
 
         static void RegisterURLProtocol(string myAppPath)
         {
-            RegistryKey key = Registry.ClassesRoot.OpenSubKey("HabboGallery");
+            RegistryKey key = Registry.ClassesRoot.OpenSubKey(Constants.APP_NAME);
 
             if (key == null)
             {
-                key = Registry.ClassesRoot.CreateSubKey("HabboGallery");
-                key.SetValue(string.Empty, "URL: HabboGallery Protocol");
-                key.SetValue("URL Protocol", string.Empty);
+                key = Registry.ClassesRoot.CreateSubKey(Constants.APP_NAME);
+                key.SetValue(string.Empty, Constants.PROTOCOL_VALUE);
+                key.SetValue(Constants.KEY_PROTOCOL_VALUE, string.Empty);
 
-                key = key.CreateSubKey(@"shell\open\command");
-                key.SetValue(string.Empty, myAppPath + " " + "%1");
+                key = key.CreateSubKey(Constants.SUBKEY_SHELL_OPEN_COMMAND);
+                key.SetValue(string.Empty, myAppPath + Constants.PROTOCOL_ARGS);
             }
 
             key.Close();
@@ -155,9 +175,14 @@ namespace HabboGalleryInstaller
             }
 
             if (result.Count < fileNames.Length)
-                throw new FileNotFoundException("One or more required files could not be found.");
+                throw new FileNotFoundException(Constants.FILES_MISSING_MESSAGE);
 
             return result;
+        }
+
+        private void ExitBtn_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

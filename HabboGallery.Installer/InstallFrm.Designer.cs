@@ -38,10 +38,11 @@
             this.CustomPathTxt = new System.Windows.Forms.TextBox();
             this.MainContinueButton = new System.Windows.Forms.Button();
             this.MainInfoLbl = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.LogoBx = new System.Windows.Forms.PictureBox();
             this.LaunchAppTgl = new System.Windows.Forms.CheckBox();
+            this.ExitBtn = new System.Windows.Forms.Button();
             this.CustomInstallationPnl.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.LogoBx)).BeginInit();
             this.SuspendLayout();
             // 
             // CustomizeTgl
@@ -141,15 +142,15 @@
             this.MainInfoLbl.Text = "This installer will guide you through the installation of HabboGallery.";
             this.MainInfoLbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // pictureBox1
+            // LogoBx
             // 
-            this.pictureBox1.Image = global::HabboGalleryInstaller.Properties.Resources.InstallerLogo;
-            this.pictureBox1.Location = new System.Drawing.Point(4, 1);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(796, 64);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBox1.TabIndex = 5;
-            this.pictureBox1.TabStop = false;
+            this.LogoBx.Image = global::HabboGalleryInstaller.Properties.Resources.InstallerLogo;
+            this.LogoBx.Location = new System.Drawing.Point(4, 1);
+            this.LogoBx.Name = "LogoBx";
+            this.LogoBx.Size = new System.Drawing.Size(796, 64);
+            this.LogoBx.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.LogoBx.TabIndex = 5;
+            this.LogoBx.TabStop = false;
             // 
             // LaunchAppTgl
             // 
@@ -164,25 +165,39 @@
             this.LaunchAppTgl.UseVisualStyleBackColor = true;
             this.LaunchAppTgl.Visible = false;
             // 
+            // ExitBtn
+            // 
+            this.ExitBtn.BackColor = System.Drawing.SystemColors.Menu;
+            this.ExitBtn.FlatAppearance.BorderSize = 0;
+            this.ExitBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ExitBtn.Location = new System.Drawing.Point(721, 0);
+            this.ExitBtn.Name = "ExitBtn";
+            this.ExitBtn.Size = new System.Drawing.Size(83, 23);
+            this.ExitBtn.TabIndex = 9;
+            this.ExitBtn.Text = "Exit";
+            this.ExitBtn.UseVisualStyleBackColor = false;
+            this.ExitBtn.Click += new System.EventHandler(this.ExitBtn_Click);
+            // 
             // InstallFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(804, 300);
+            this.Controls.Add(this.ExitBtn);
             this.Controls.Add(this.LaunchAppTgl);
             this.Controls.Add(this.CustomizeTgl);
             this.Controls.Add(this.CustomInstallationPnl);
             this.Controls.Add(this.MainContinueButton);
             this.Controls.Add(this.MainInfoLbl);
-            this.Controls.Add(this.pictureBox1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Controls.Add(this.LogoBx);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "InstallFrm";
             this.Text = "HabboGallery - Installer";
             this.CustomInstallationPnl.ResumeLayout(false);
             this.CustomInstallationPnl.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.LogoBx)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -198,8 +213,9 @@
         private System.Windows.Forms.TextBox CustomPathTxt;
         private System.Windows.Forms.Button MainContinueButton;
         private System.Windows.Forms.Label MainInfoLbl;
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox LogoBx;
         private System.Windows.Forms.CheckBox LaunchAppTgl;
+        private System.Windows.Forms.Button ExitBtn;
     }
 }
 

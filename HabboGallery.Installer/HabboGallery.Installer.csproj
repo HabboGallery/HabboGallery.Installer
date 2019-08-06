@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppDownloader.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="GuideMessages.cs" />
     <Compile Include="Helpers\UacHelper.cs" />
     <Compile Include="InstallFrm.cs">
