@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("HabboGalleryInstaller")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("HabboGallery Installer")]
+[assembly: AssemblyDescription("An installer for HabboGallery Desktop")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("HabboGalleryInstaller")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyCompany("HabboGallery")]
+[assembly: AssemblyProduct("HabboGallery Installer")]
+[assembly: AssemblyCopyright("Copyright HabboGallery ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
