@@ -184,5 +184,16 @@ namespace HabboGalleryInstaller
         {
             Close();
         }
+
+        private void SelectCustomPathBtn_Click(object sender, EventArgs e)
+        {
+            var result = InstallationPathDlg.ShowDialog();
+
+            if (result != DialogResult.OK)
+                return;
+
+            InstallPath = InstallationPathDlg.SelectedPath;
+            CustomPathTxt.Text = InstallPath;
+        }
     }
 }

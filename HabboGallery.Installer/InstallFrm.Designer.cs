@@ -105,6 +105,7 @@
             this.SelectCustomPathBtn.TabIndex = 6;
             this.SelectCustomPathBtn.Text = "Select Folder";
             this.SelectCustomPathBtn.UseVisualStyleBackColor = false;
+            this.SelectCustomPathBtn.Click += new System.EventHandler(this.SelectCustomPathBtn_Click);
             // 
             // CustomPathTxt
             // 
