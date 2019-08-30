@@ -101,7 +101,18 @@ namespace HabboGalleryInstaller
 
                     string pathToTemp = await AppDownloader.DownloadZipAsync(Constants.DOWNLOAD_PATH);
                     MainInfoLbl.Text = GuideMessages.TEXT_EXTRACTING;
-                    ZipFile.ExtractToDirectory(pathToTemp, InstallPath);
+
+                    using (ZipArchive archive = ZipFile.OpenRead(pathToTemp))
+                    {
+                        foreach (var file in archive.Entries)
+                        {
+                            var filePath = Path.Combine(InstallPath, file.Name);
+                            if (File.Exists(filePath))
+                                File.Delete(filePath);
+                        }
+
+                        archive.ExtractToDirectory(InstallPath);
+                    }
                     File.Delete(pathToTemp);
 
                     try
