@@ -16,5 +16,7 @@
         public const string KEY_PROTOCOL_VALUE = "URL Protocol";
         public const string PROTOCOL_ARGS = " %1";
         public const string APP_PROCESS_NAME = "HabboGallery.Desktop";
+        public const string STILL_RUNNING_BODY = "Please close any running HabboGallery apps before continuing.";
+        public const string STILL_RUNNING_TITLE = "HabboGallery Installer - Running HabboGallery App Found";
     }
 }

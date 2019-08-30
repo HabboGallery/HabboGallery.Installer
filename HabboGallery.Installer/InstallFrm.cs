@@ -55,8 +55,25 @@ namespace HabboGalleryInstaller
 
             Application.AddMessageFilter(this);
 
-            Process.GetProcessesByName(Constants.APP_PROCESS_NAME).ToList().ForEach(p => p.Kill());
-            Eavesdropper.Terminate();
+            CheckForProcesses();
+        }
+
+        private void CheckForProcesses()
+        {
+            int processCount = Process.GetProcessesByName(Constants.APP_PROCESS_NAME).Length;
+            bool processesFound =  processCount > 0;
+            while (processesFound)
+            {
+                var result = MessageBox.Show(Constants.STILL_RUNNING_BODY, Constants.STILL_RUNNING_TITLE, MessageBoxButtons.RetryCancel, MessageBoxIcon.Exclamation);
+                if (result == DialogResult.Retry)
+                {
+                    processesFound = Process.GetProcessesByName(Constants.APP_PROCESS_NAME).Length > 0;
+                }
+                else if (result == DialogResult.Cancel)
+                {
+                    Environment.Exit(0);
+                }
+            }
         }
 
         private void CustomizeTgl_CheckedChanged(object sender, EventArgs e)
