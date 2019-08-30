@@ -15,5 +15,6 @@
         public const string SUBKEY_SHELL_OPEN_COMMAND = @"shell\open\command";
         public const string KEY_PROTOCOL_VALUE = "URL Protocol";
         public const string PROTOCOL_ARGS = " %1";
+        public const string APP_PROCESS_NAME = "HabboGallery.Desktop";
     }
 }

@@ -54,6 +54,9 @@ namespace HabboGalleryInstaller
             CustomPathTxt.Text = InstallPath;
 
             Application.AddMessageFilter(this);
+
+            Process.GetProcessesByName(Constants.APP_PROCESS_NAME).ToList().ForEach(p => p.Kill());
+            Eavesdropper.Terminate();
         }
 
         private void CustomizeTgl_CheckedChanged(object sender, EventArgs e)
