@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<UseWindowsForms>true</UseWindowsForms>
+		<TargetFramework>net5.0-windows</TargetFramework>
+		
+		<SelfContained>false</SelfContained>
+		<PublishSingleFile>true</PublishSingleFile>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Authors>HabboGallery</Authors>
+		<Copyright>Copyright © HabboGallery 2020</Copyright>
+
+		<Version>1.0</Version>
+		<FileVersion>1.0</FileVersion>
+		<AssemblyVersion>1.0</AssemblyVersion>
+		<ApplicationIcon>Resources/Icon.ico</ApplicationIcon>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Content Remove="Resources\Icon.ico" />
+		<EmbeddedResource Include="Resources\Icon.Ico" />
+	</ItemGroup>
+</Project>
