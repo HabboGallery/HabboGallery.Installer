@@ -28,7 +28,7 @@ namespace HabboGallery.Installer
         private const string DESKTOP_NAME = "HabboGallery.Desktop";
         private const string SCHEMEHANDLER_NAME = "HabboGallery.SchemeHandler";
 
-        private DirectoryInfo _applicationDirectory;
+        private readonly DirectoryInfo _applicationDirectory;
 
         public bool HasAdminPrivileges { get; }
 
@@ -82,7 +82,7 @@ namespace HabboGallery.Installer
             var resultButton = TaskDialog.ShowDialog(this, elevatePermissionsPage);
             if (resultButton == buttonRestart)
             {
-                Process proc = new Process();
+                Process proc = new();
                 proc.StartInfo.FileName = Environment.GetCommandLineArgs()[0];
                 proc.StartInfo.UseShellExecute = true;
                 proc.StartInfo.Verb = "runas";
@@ -99,8 +99,8 @@ namespace HabboGallery.Installer
 
                 TaskDialogCommandLinkButton killInstanceButton = new()
                 {
-                    Text = "&Close the running processes",
-                    DescriptionText = "This will try to terminate the running HabboGallery application(s)!"
+                    Text = "&Close the running process",
+                    DescriptionText = "This will try to terminate the running HabboGallery application!"
                 };
                 TaskDialogCommandLinkButton retryButton = new()
                 {
@@ -151,19 +151,14 @@ namespace HabboGallery.Installer
 
             TaskDialogPage installationProgressPage = new()
             {
-                Caption = "HabboGallery",
+                Caption = APPLICATION_NAME,
                 Heading = "Installing...",
                 Text = "Please wait while the operation is in progress.",
                 Icon = TaskDialogIcon.Information,
 
-                ProgressBar = new TaskDialogProgressBar()
+                ProgressBar = new TaskDialogProgressBar(TaskDialogProgressBarState.Marquee),
+                Expander = new TaskDialogExpander("Initializing...")
                 {
-                    State = TaskDialogProgressBarState.Marquee
-                },
-
-                Expander = new TaskDialogExpander()
-                {
-                    Text = "Initializing...",
                     Position = TaskDialogExpanderPosition.AfterFootnote
                 },
 
@@ -175,7 +170,7 @@ namespace HabboGallery.Installer
 
             TaskDialogPage finishedPage = new()
             {
-                Caption = "HabboGallery",
+                Caption = APPLICATION_NAME,
                 Heading = "Success!",
                 Text = "The HabboGallery Desktop application has been installed succesfully.",
                 Icon = TaskDialogIcon.ShieldSuccessGreenBar,
@@ -209,16 +204,9 @@ namespace HabboGallery.Installer
 
         private async IAsyncEnumerable<int> DownloadAndInstallAsync()
         {
-            void CleanUpApplicationDirectory()
-            {
-                foreach (FileInfo file in _applicationDirectory.EnumerateFiles())
-                {
-                    if (file.Name.EndsWith(".config")) continue;
-                    file.Delete();
-                }
-            }
-
-            await Task.Run(CleanUpApplicationDirectory);
+            // Clean-up existing installation
+            _applicationDirectory.Delete(true);
+            _applicationDirectory.Create();
             yield return 25;
 
             // Download and extract the main desktop application
@@ -226,13 +214,7 @@ namespace HabboGallery.Installer
             await Task.Run(() =>
             {
                 using var archive = new ZipArchive(desktopAssetStream, ZipArchiveMode.Read);
-                foreach (ZipArchiveEntry entry in archive.Entries)
-                {
-                    string entryOutputPath = Path.Combine(_applicationDirectory.FullName, entry.Name);
-                    if (File.Exists(entryOutputPath)) continue;
-
-                    entry.ExtractToFile(entryOutputPath);
-                }
+                archive.ExtractToDirectory(_applicationDirectory.FullName);
             });
             yield return 75;
 
@@ -240,10 +222,9 @@ namespace HabboGallery.Installer
             string schemeHandlerFileName = Path.Combine(_applicationDirectory.FullName, SCHEMEHANDLER_NAME + ".exe");
 
             using var schemeHandlerFs = File.Create(schemeHandlerFileName);
-            using var schemeHandlerAssetStream = await DownloadAssetAsync(SCHEMEHANDLER_NAME, "exe");
+            using var schemeHandlerAssetStream = await DownloadAssetAsync(SCHEMEHANDLER_NAME, "exe").ConfigureAwait(false);
 
             await schemeHandlerAssetStream.CopyToAsync(schemeHandlerFs).ConfigureAwait(false);
-
             yield return 98;
 
             // Create desktop and start-menu shortcuts
@@ -251,8 +232,8 @@ namespace HabboGallery.Installer
 
             string desktopAppFileName = Path.Combine(_applicationDirectory.FullName, DESKTOP_NAME + ".exe");
 
-            CreateShortcut(desktopAppFileName, "HabboGallery", SHORTCUT_DESCRIPTION, Environment.SpecialFolder.DesktopDirectory);
-            CreateShortcut(desktopAppFileName, "HabboGallery", SHORTCUT_DESCRIPTION, Environment.SpecialFolder.StartMenu);
+            CreateShortcut(desktopAppFileName, APPLICATION_NAME, SHORTCUT_DESCRIPTION, Environment.SpecialFolder.DesktopDirectory);
+            CreateShortcut(desktopAppFileName, APPLICATION_NAME, SHORTCUT_DESCRIPTION, Environment.SpecialFolder.StartMenu);
             yield return 99;
 
             // Register the URL Protocol
@@ -275,12 +256,12 @@ namespace HabboGallery.Installer
 
         private static void RegisterURLProtocol(string myAppPath)
         {
-            using RegistryKey key = Registry.ClassesRoot.CreateSubKey("HabboGallery");
+            using RegistryKey key = Registry.ClassesRoot.CreateSubKey(APPLICATION_NAME);
             key.SetValue(string.Empty, "URL: HabboGallery Protocol");
             key.SetValue("URL Protocol", string.Empty);
 
             using RegistryKey commandKey = key.CreateSubKey("shell\\open\\command");
-            key.SetValue(string.Empty, myAppPath + " \"%1\"");
+            commandKey.SetValue(string.Empty, $"\"{myAppPath}\" \"%1\"");
 
             key.Close();
         }
