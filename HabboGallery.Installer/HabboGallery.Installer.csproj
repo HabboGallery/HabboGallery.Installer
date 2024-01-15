@@ -3,7 +3,9 @@
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<UseWindowsForms>true</UseWindowsForms>
-		<TargetFramework>net5.0-windows</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<TargetFramework>net8.0-windows</TargetFramework>
 		
 		<SelfContained>false</SelfContained>
 		<PublishSingleFile>true</PublishSingleFile>
@@ -12,11 +14,11 @@
 
 	<PropertyGroup>
 		<Authors>HabboGallery</Authors>
-		<Copyright>Copyright © HabboGallery 2020</Copyright>
+		<Copyright>Copyright © HabboGallery</Copyright>
 
-		<Version>1.0.0</Version>
-		<FileVersion>1.0.0.1</FileVersion>
-		<AssemblyVersion>1.0.0</AssemblyVersion>
+		<Version>1.2.0</Version>
+		<FileVersion>1.2.0</FileVersion>
+		<AssemblyVersion>1.2.0</AssemblyVersion>
 		<ApplicationIcon>Resources/Icon.ico</ApplicationIcon>
 	</PropertyGroup>
 
@@ -27,5 +29,9 @@
 	<ItemGroup>
 		<Content Remove="Resources\Icon.ico" />
 		<EmbeddedResource Include="Resources\Icon.Ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="TerraFX.Interop.Windows" Version="10.0.22621.5" />
 	</ItemGroup>
 </Project>
