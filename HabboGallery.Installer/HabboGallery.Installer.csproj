@@ -30,8 +30,4 @@
 		<Content Remove="Resources\Icon.ico" />
 		<EmbeddedResource Include="Resources\Icon.Ico" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <PackageReference Include="TerraFX.Interop.Windows" Version="10.0.22621.5" />
-	</ItemGroup>
 </Project>

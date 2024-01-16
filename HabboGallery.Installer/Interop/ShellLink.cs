@@ -1,47 +1,98 @@
 ﻿using System.Runtime.InteropServices;
-
-using TerraFX.Interop.Windows;
-
-using static TerraFX.Interop.Windows.Windows;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace HabboGallery.Installer.Interop;
 
-internal static unsafe class ShellLink
+internal static unsafe partial class ShellLink
 {
     public static void CreateAndSave(string description, string targetPath, string shortcutPath)
     {
-        using ComPtr<IShellLinkW> shellLink = default;
-
-        ThrowIfFailed(CoCreateInstance(
-            __uuidof<TerraFX.Interop.Windows.ShellLink>(),
+        Guid shellLinkclassId = new("00021401-0000-0000-C000-000000000046");
+        Guid shellLinkinterfaceId = new(IShellLinkW.IID);
+        CoCreateInstance(
+            &shellLinkclassId,
             null,
-            (uint)CLSCTX.CLSCTX_INPROC_SERVER,
-            __uuidof<IShellLinkW>(),
-            (void**)shellLink.GetAddressOf()));
+            /* CLSCTX_INPROC_SERVER */ 1,
+            &shellLinkinterfaceId,
+            out nint shellLinkObj).ThrowIfFailed();
+
+        var comWrappers = new StrategyBasedComWrappers();
+        var shellLink = (IShellLinkW)comWrappers.GetOrCreateObjectForComInstance(shellLinkObj, CreateObjectFlags.None);
 
         fixed (char* descriptionPtr = description)
         fixed (char* targetPathPtr = targetPath)
+        fixed (char* shortcutPathPtr = shortcutPath)
         {
-            ThrowIfFailed(shellLink.Get()->SetDescription(descriptionPtr));
-            ThrowIfFailed(shellLink.Get()->SetPath(targetPathPtr));
+            shellLink.SetDescription(descriptionPtr);
+            shellLink.SetPath(targetPathPtr);
 
-            fixed (char* shortcutPathPtr = shortcutPath)
-            {
-                ComPtr<IPersistFile> file = default;
-                ThrowIfFailed(shellLink.As(&file));
+            Guid persistFileInterfaceId = new(IPersistFile.IID);
+            Marshal.QueryInterface(shellLinkObj, ref persistFileInterfaceId, out nint persistFileObj).ThrowIfFailed();
 
-                ThrowIfFailed(file.Get()->Save(shortcutPathPtr, false));
+            var file = (IPersistFile)comWrappers.GetOrCreateObjectForComInstance(persistFileObj, CreateObjectFlags.None);
+            file.Save(shortcutPathPtr, false);
 
-                file.Dispose();
-            }
+            Marshal.Release(shellLinkObj);
+            Marshal.Release(persistFileObj);
         }
     }
 
-    private static void ThrowIfFailed(HRESULT hr)
+    private static void ThrowIfFailed(this int hresult)
     {
-        if (FAILED(hr))
+        if (hresult < 0)
         {
-            Marshal.ThrowExceptionForHR(hr);
+            Marshal.ThrowExceptionForHR(hresult);
         }
+    }
+
+    [LibraryImport("ole32")]
+    public static partial int CoCreateInstance(Guid* rclsid, void* pUnkOuter, uint dwClsContext, Guid* riid, out nint ppv);
+
+    [GeneratedComInterface]
+    [Guid(IID)]
+    public partial interface IShellLinkW
+    {
+        public const string IID = "000214F9-0000-0000-C000-000000000046";
+
+        void GetPath(char* pszFile, int cch, void* pfd, uint fFlags);
+        void GetIDList(void** ppidl);
+        void SetIDList(void** pidl);
+        void GetDescription(char* pszName, int cch);
+        void SetDescription(char* pszName);
+        void GetWorkingDirectory(char* pszDir, int cch);
+        void SetWorkingDirectory(char* pszDir);
+        void GetArguments(char* pszArgs, int cch);
+        void SetArguments(char* pszArgs);
+        void GetHotkey(ushort* pwHotkey);
+        void SetHotkey(ushort wHotkey);
+        void GetShowCmd(int* piShowCmd);
+        void SetShowCmd(int iShowCmd);
+        void GetIconLocation(char* pszIconPath, int cch, int* piIcon);
+        void SetIconLocation(char* pszIconPath, int iIcon);
+        void SetRelativePath(char* pszPathRel, uint dwReserved);
+        void Resolve(void* hwnd, uint fFlags);
+        void SetPath(char* pszFile);
+    }
+
+    [GeneratedComInterface]
+    [Guid(IID)]
+    public partial interface IPersistFile : IPersist
+    {
+        public const string IID = "0000010B-0000-0000-C000-000000000046";
+
+        void IsDirty();
+        void Load(char* pszFileName, uint dwMode);
+        void Save(char* pszFileName, [MarshalAs(UnmanagedType.U4)] bool fRemember);
+        void SaveCompleted(char* pszFileName);
+        void GetCurFile(char** ppszFileName);
+    }
+
+    [GeneratedComInterface]
+    [Guid(IID)]
+    public partial interface IPersist
+    {
+        public const string IID = "0000010C-0000-0000-C000-000000000046";
+
+        void GetClassID(Guid* pClassID);
     }
 }
